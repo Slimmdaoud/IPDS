@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+*.log
+blacklist.txt
+ids_model.pkl
+scaler.pkl
+KDDTrain+.txt
+KDDTest+.txt

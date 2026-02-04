@@ -1,0 +1,6 @@
+scapy
+flask
+pandas
+scikit-learn
+joblib
+scipy

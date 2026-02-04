@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDPS Sentinel | IA & Prevention Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+        .bg-purple-glass { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); }
+        .bg-red-glass { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans leading-normal tracking-normal">
+
+    <!-- Navbar -->
+    <nav class="bg-gray-800 border-b border-gray-700 p-4 sticky top-0 z-50 shadow-2xl">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-br from-red-600 to-purple-700 p-2 rounded-lg shadow-lg">
+                    <i class="fas fa-shield-halved text-white text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold tracking-wider">IDPS <span class="text-red-500">SENTINEL</span> <span class="text-xs font-light text-gray-400 ml-2">v2.0 HYBRIDE IA</span></h1>
+            </div>
+            <div class="flex items-center space-x-4 text-sm">
+                <span class="flex items-center"><i class="fas fa-circle text-green-500 text-[10px] mr-2 animate-pulse"></i> SYSTÈME ACTIF</span>
+                <span class="bg-gray-700 px-3 py-1 rounded-full border border-gray-600 font-mono text-blue-400">ens33</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase font-bold tracking-widest">Total Trafic</p>
+                        <h3 class="text-3xl font-bold mt-1" id="stat-packets">--</h3>
+                    </div>
+                    <i class="fas fa-network-wired text-blue-500 text-3xl opacity-30"></i>
+                </div>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-red-600">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase font-bold tracking-widest">Alertes Détectées</p>
+                        <h3 class="text-3xl font-bold mt-1 text-red-500" id="stat-alerts">--</h3>
+                    </div>
+                    <i class="fas fa-biohazard text-red-500 text-3xl opacity-30"></i>
+                </div>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg border-l-4 border-l-orange-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs uppercase font-bold tracking-widest">Attaquants Bannis</p>
+                        <h3 class="text-3xl font-bold mt-1 text-orange-500" id="stat-blacklist">--</h3>
+                    </div>
+                    <i class="fas fa-user-slash text-orange-500 text-3xl opacity-30"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Alert Feed (2/3 width) -->
+            <div class="lg:col-span-2 space-y-8">
+                <section>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold flex items-center">
+                            <i class="fas fa-bell text-red-500 mr-2"></i> Journal des Alertes (IA & Règles)
+                        </h2>
+                    </div>
+                    <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-900/50 border-b border-gray-700 text-gray-500 text-[10px] uppercase">
+                                        <th class="p-4">Menace</th>
+                                        <th class="p-4">Méthode</th>
+                                        <th class="p-4">Source IP</th>
+                                        <th class="p-4">Détails de l'analyse</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alert-table-body" class="text-sm">
+                                    <!-- Inséré par JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Packet Log -->
+                <section>
+                    <h2 class="text-lg font-bold mb-4 flex items-center text-gray-400">
+                        <i class="fas fa-stream text-blue-500 mr-2"></i> Flux Réseau en Temps Réel
+                    </h2>
+                    <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-inner">
+                        <div class="max-h-60 overflow-y-auto custom-scrollbar">
+                            <table class="w-full text-left text-[11px] font-mono">
+                                <thead class="bg-gray-900 sticky top-0">
+                                    <tr class="text-gray-600 border-b border-gray-700">
+                                        <th class="p-2">PROTO</th>
+                                        <th class="p-2">IP SOURCE</th>
+                                        <th class="p-2">IP DEST</th>
+                                        <th class="p-2">FLAGS</th>
+                                        <th class="p-2">TAILLE</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="packet-table-body" class="text-gray-400">
+                                    <!-- Inséré par JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Blacklist (1/3 width) -->
+            <div class="lg:col-span-1">
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    <i class="fas fa-ban text-orange-600 mr-2"></i> Blacklist Active
+                </h2>
+                <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 shadow-xl">
+                    <ul id="blacklist-content" class="space-y-3">
+                        <!-- Inséré par JS -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+
+                // Stats
+                document.getElementById('stat-packets').innerText = data.stats.total_packets;
+                document.getElementById('stat-alerts').innerText = data.alerts.length;
+                document.getElementById('stat-blacklist').innerText = data.blacklist.length;
+
+                // Alerts avec distinction IA
+                const alertBody = document.getElementById('alert-table-body');
+                alertBody.innerHTML = data.alerts.reverse().slice(0, 10).map(a => {
+                    const isIA = a.source === "Machine Learning";
+                    const rowClass = isIA ? "hover:bg-purple-900/10" : "hover:bg-red-900/10";
+                    const badgeClass = isIA 
+                        ? "bg-purple-600/20 text-purple-400 border border-purple-500/30" 
+                        : "bg-red-500/20 text-red-400 border border-red-500/30";
+                    
+                    return `
+                        <tr class="border-b border-gray-700/50 ${rowClass} transition-colors">
+                            <td class="p-4">
+                                <span class="${badgeClass} px-2 py-1 rounded text-[10px] font-bold uppercase">
+                                    ${a.type}
+                                </span>
+                            </td>
+                            <td class="p-4 text-[11px] font-semibold ${isIA ? 'text-purple-400' : 'text-gray-400'}">
+                                <i class="fas ${isIA ? 'fa-brain' : 'fa-list-check'} mr-1"></i>
+                                ${a.source || "Règle"}
+                            </td>
+                            <td class="p-4 font-mono text-gray-300 text-xs">${a.src_ip}</td>
+                            <td class="p-4 text-gray-500 text-[11px] italic">${a.details}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Traffic Live
+                const packetBody = document.getElementById('packet-table-body');
+                packetBody.innerHTML = data.packets.reverse().slice(0, 15).map(p => `
+                    <tr class="border-b border-gray-800 hover:bg-gray-700/50 transition-colors">
+                        <td class="p-2 font-bold text-blue-500">${p.protocol}</td>
+                        <td class="p-2 text-gray-300">${p.src_ip}</td>
+                        <td class="p-2 text-gray-500">${p.dst_ip}</td>
+                        <td class="p-2 text-gray-600">${p.tcp_flags || '-'}</td>
+                        <td class="p-2 text-gray-400">${p.length} B</td>
+                    </tr>
+                `).join('');
+                
+                // Blacklist
+                const blContent = document.getElementById('blacklist-content');
+                blContent.innerHTML = data.blacklist.map(ip => `
+                    <li class="flex justify-between items-center bg-gray-900 p-3 rounded-lg border border-gray-700 group">
+                        <div class="flex items-center font-mono text-sm text-orange-200">
+                            <i class="fas fa-shield-virus text-orange-600 mr-3 text-xs"></i>
+                            ${ip}
+                        </div>
+                        <button onclick="unblockIP('${ip}')" class="text-gray-600 hover:text-red-500 p-1 transition-colors">
+                            <i class="fas fa-trash-can"></i>
+                        </button>
+                    </li>
+                `).join('');
+            } catch (e) { console.error("Update error:", e); }
+        }
+
+        async function unblockIP(ip) {
+            if (!confirm(`Débloquer l'IP ${ip} ?`)) return;
+            try {
+                await fetch(`/api/unblock/${ip}`, { method: 'POST' });
+                updateDashboard();
+            } catch (e) { alert("Erreur de déblocage"); }
+        }
+
+        setInterval(updateDashboard, 2000);
+        updateDashboard();
+    </script>
+</body>
+</html>
